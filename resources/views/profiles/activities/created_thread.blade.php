@@ -1,4 +1,4 @@
-@component('profiles.activities.actvity')
+@component('profiles.activities.activity')
     @slot('heading')
         {{ $profileUser->name }} published a <a href="{{ $activity->subject->path() }}">
             {{ $activity->subject->title }}</a>

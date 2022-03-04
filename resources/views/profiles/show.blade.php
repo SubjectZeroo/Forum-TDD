@@ -17,7 +17,9 @@
                     </div>
                     @foreach ($activity as $record)
                         @if (view()->exists("profiles.activities.{$record->type}"))
-                            @include("profiles.activities.{$record->type}", ['activity' => $record])
+                            @include("profiles.activities.{$record->type}", [
+                                'activity' => $record,
+                            ])
                         @endif
                     @endforeach
 
