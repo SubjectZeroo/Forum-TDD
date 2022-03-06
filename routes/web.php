@@ -32,6 +32,8 @@ Route::delete('threads/{channel}/{thread}', [App\Http\Controllers\ThreadControll
 Route::post('threads', [App\Http\Controllers\ThreadController::class, 'store']);
 Route::get('threads/{channel}', [App\Http\Controllers\ThreadController::class, 'index']);
 // Route::resource('threads', ThreadController::class);
+
+Route::get('/threads/{channel}/{thread}/replies', [App\Http\Controllers\ReplyController::class, 'index']);
 Route::post('/threads/{channel}/{thread}/replies', [App\Http\Controllers\ReplyController::class, 'store']);
 Route::patch('replies/{reply}', [App\Http\Controllers\ReplyController::class, 'update']);
 Route::delete('replies/{reply}', [App\Http\Controllers\ReplyController::class, 'destroy']);

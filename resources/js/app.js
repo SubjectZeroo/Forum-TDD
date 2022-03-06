@@ -20,6 +20,7 @@ window.Vue = require('vue').default;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('flash', require('./components/Flash.vue').default);
+Vue.component('paginator', require('./components/Paginator.vue').default);
 Vue.component('thread-view', require('./pages/Thread.vue').default);
 // Vue.component('reply', require('./components/Reply.vue').default);
 // Vue.component('favorite', require('./components/Favorite.vue').default);

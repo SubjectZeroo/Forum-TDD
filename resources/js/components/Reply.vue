@@ -5,7 +5,7 @@
                     <h5>
                         <a :href="'/profiles/'+data.owner.name"
                             v-text="data.owner.name">
-                        </a> said {{ data.created_at }}...
+                        </a> said {{   new Date(data.created_at).toLocaleDateString()}}...
                     </h5>
                         <div v-if="signedIn">
                             <favorite :reply="data"></favorite>
