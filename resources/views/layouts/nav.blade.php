@@ -44,6 +44,9 @@
                             <li>
                                 <a class="dropdown-item" href="/threads?popular=1">Popular Threads</a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="/threads?unanswered=1">Unanswered Threads</a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -83,7 +86,7 @@
                             <a href="{{ route('profiles', Auth::user()) }}" class="dropdown-item"> My Profile</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                                                                                                                                                                                                                 document.getElementById('logout-form').submit();">
+                                                                                                                                                                                                                     document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
                             </a>
 

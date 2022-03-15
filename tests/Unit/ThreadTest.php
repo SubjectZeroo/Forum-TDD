@@ -53,11 +53,47 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-
     function a_thread_belongs_to_a_channel()
     {
         $thread = Thread::factory()->create();
 
         $this->assertInstanceOf('App\Models\Channel', $thread->channel);
+    }
+
+    /** @test */
+    function a_thread_can_be_subscribed_to()
+    {
+        //Given we have a thread
+        //And a authenticated user
+        //When the user subscribe to the thread
+        //Then we should be able to fetch all threads that the user has subscribed to.
+
+        $thread = Thread::factory()->create();
+
+
+
+        $thread->subscribe($userId = 1);
+
+
+
+        $this->assertEquals(
+            1,
+            $thread->subscriptions()->where('user_id', $userId)->count()
+        );
+    }
+
+    /** @test */
+    function a_thread_can_be_unsubscribed_from()
+    {
+
+        //GIven we have a thread
+        //and a user who is subscribed
+        $thread = Thread::factory()->create();
+
+        $thread->subscribe($userId = 1);
+
+        $thread->unsubscribe($userId);
+
+        $this->assertCount(0,  $thread->subscriptions);
     }
 }
