@@ -6,6 +6,7 @@ use App\Filters\ThreadFilters;
 use App\Models\Channel;
 use App\Models\Thread;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -55,10 +56,12 @@ class ThreadController extends Controller
     {
 
         $this->validate($request, [
-            'title' => 'required',
-            'body' => 'required',
+            'title' => 'required|spamfree',
+            'body' => 'required|spamfree',
             'channel_id' => 'required|exists:channels,id'
         ]);
+
+
 
         $thread = Thread::create([
             'user_id' => Auth::id(),
@@ -79,6 +82,20 @@ class ThreadController extends Controller
      */
     public function show($channelId, Thread $thread)
     {
+
+        // return $thread->append('isSubscribedTo');
+
+        //Record that user the visisted this page
+        //Record a timestamp
+        // $key = sprintf("users.%s.visits.%s", auth()->id(), $thread->id);
+
+        // cache()->forever($key, Carbon::now());
+
+
+
+        if (auth()->check()) {
+            auth()->user()->read($thread);
+        }
 
         return view('threads.show', compact('thread'));
     }

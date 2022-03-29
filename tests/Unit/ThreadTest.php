@@ -4,8 +4,11 @@ namespace Tests\Unit;
 
 use App\Models\Thread;
 use App\Models\User;
+use App\Notifications\ThreadWasUpdated;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Tests\TestCase;
 
 class ThreadTest extends TestCase
@@ -53,6 +56,20 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
+    function a_thread_notifies_all_registered_subscribers_when_a_reply_is_added()
+    {
+
+        FacadesNotification::fake();
+
+        $this->signIn()->thread->subscribe()->addReply([
+            'body' => 'Foobar',
+            'user_id' => 1
+        ]);
+
+        FacadesNotification::assertSentTo(auth()->user(), ThreadWasUpdated::class);
+    }
+
+    /** @test */
     function a_thread_belongs_to_a_channel()
     {
         $thread = Thread::factory()->create();
@@ -95,5 +112,40 @@ class ThreadTest extends TestCase
         $thread->unsubscribe($userId);
 
         $this->assertCount(0,  $thread->subscriptions);
+    }
+
+    /** @test */
+    function it_knows_if_the_authenticated_is_subscribed_to_it()
+    {
+        $thread = Thread::factory()->create();
+
+
+        $this->signIn();
+
+        $this->assertFalse($thread->isSubscribedTo);
+
+        $thread->subscribe();
+
+        $this->assertTrue($thread->isSubscribedTo);
+    }
+
+    /** @test */
+    function a_thread_can_check_if_the_autheticated_user_has_read_all_replies()
+    {
+        $this->signIn();
+
+        $thread = Thread::factory()->create();
+
+        tap(auth()->user(), function ($user) use ($thread) {
+
+            $this->assertTrue($thread->hasUpdatesFor($user));
+
+
+            //Simulate that the user visited the thread
+
+            $user->read($thread);
+
+            $this->assertFalse($thread->hasUpdatesFor($user));
+        });
     }
 }

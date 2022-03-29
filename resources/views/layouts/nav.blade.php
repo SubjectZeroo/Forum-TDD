@@ -72,6 +72,7 @@
                         <a class="nav-link" href="/threads">Threads</a>
                     </li>
                 @else
+                    <user-notifications></user-notifications>
                     <li class="nav-item">
                         <a class="nav-link" href="/threads">Threads</a>
                     </li>
@@ -86,7 +87,7 @@
                             <a href="{{ route('profiles', Auth::user()) }}" class="dropdown-item"> My Profile</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                                                                                                                                                                                                                     document.getElementById('logout-form').submit();">
+                                                                                                                                                                                                                             document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
                             </a>
 
