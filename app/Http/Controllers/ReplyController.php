@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreatePostForm;
 use App\Models\Reply;
 use App\Models\Thread;
+use App\Models\User;
+use App\Notifications\YouWereMentioned;
 use GuzzleHttp\Middleware;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Http\Request;
