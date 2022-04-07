@@ -31,12 +31,22 @@ class MentionUsersTest extends TestCase
             'body' => '@JaneDoe look at this. Also @FrankDoe'
         ]);
 
-        $this->json('post', $thread->path() . '/replies', $reply->toArray());
+        $this->postJson($thread->path() . '/replies', $reply->toArray());
 
         //Them, Jane should be notified
 
-
-
         $this->assertCount(1, $jane->notifications);
+    }
+
+    /** @test */
+    function it_can_fetch_all_mentioned_users_starting_wiht_the_given_characters()
+    {
+        User::factory()->create(['name' => 'johndoe']);
+        User::factory()->create(['name' => 'johndoe2']);
+        User::factory()->create(['name' => 'janedoe']);
+
+        $results = $this->json('GET', '/api/users', ['name' => 'john']);
+
+        $this->assertCount(2, $results->json());
     }
 }

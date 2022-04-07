@@ -8,7 +8,6 @@
                                 class="form-control"
                                 placeholder="Have something to say?"
                                 rows="5"
-                                required
                                 v-model="body">
                     </textarea>
                 </div>
@@ -21,7 +20,9 @@
 </template>
 
 <script>
+import Tribute from "tributejs";
 export default {
+
     data() {
         return {
             body: '',
@@ -32,6 +33,26 @@ export default {
         signedIn() {
             return window.App.signedIn;
         }
+    },
+
+    mounted() {
+        let tribute = new Tribute({
+
+            //column to search against in the object (accepts function or strign)
+            lookup: 'value',
+
+            fillAttr: 'value',
+
+            values: function(query, cb) {
+                axios.get('/api/users', {params: {name: query}} )
+                    .then(function(response) {
+                        console.log(response);
+                        cb(response.data);
+                    });
+            },
+
+        });
+        tribute.attach(document.querySelectorAll("#body"));
     },
 
     methods: {
