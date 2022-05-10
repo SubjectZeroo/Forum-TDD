@@ -46,7 +46,7 @@ class SubscribeToThreadsTest extends TestCase
         $thread =  Thread::factory()->create();
 
 
-        $thread->subscribed();
+        $thread->subscribe();
 
         //And the user subscribe to the thread
 

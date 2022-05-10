@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Notification as FacadesNotification;
+use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 class ThreadTest extends TestCase
@@ -24,11 +25,11 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    function a_thread_can_make_a_string_a_path()
+    function a_thread_has_a_path()
     {
         $thread = Thread::factory()->create();
 
-        $this->assertEquals("/threads/{$thread->channel->slug}/{$thread->id}", $thread->path());
+        $this->assertEquals("/threads/{$thread->channel->slug}/{$thread->slug}", $thread->path());
     }
 
     /** @test */
@@ -147,5 +148,45 @@ class ThreadTest extends TestCase
 
             $this->assertFalse($thread->hasUpdatesFor($user));
         });
+    }
+
+    // /** @test */
+    // function a_thread_records_each_visit()
+    // {
+
+
+    //     $thread = Thread::factory()->make(['id' => 1]);
+
+    //     $thread->visits()->reset();
+
+    //     $this->assertSame(0, $thread->visits()->count());
+
+    //     // $thread->resetVisit();
+
+    //     $thread->visits()->record();
+
+    //     $this->assertEquals(1, $thread->visits()->count());
+
+    //     // $thread->recordVisit();
+
+    //     // $this->assertEquals(2, $thread->visits());
+    // }
+
+    /** @test */
+    function a_thread_may_be_locked()
+    {
+        $this->assertFalse($this->thread->locked);
+
+        $this->thread->lock();
+
+        $this->assertTrue($this->thread->locked);
+    }
+
+    /** @test */
+    function a_threads_body_is_sanitized_automatically()
+    {
+        $thread = Thread::factory()->make(['body' => '<script>alert("bad")</script><p>This is okay.</p>']);
+
+        $this->assertEquals('<p>This is okay.</p>', $thread->body);
     }
 }

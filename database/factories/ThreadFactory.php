@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Channel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ThreadFactory extends Factory
 {
@@ -20,6 +21,9 @@ class ThreadFactory extends Factory
             'channel_id' => Channel::factory(),
             'title' => $this->faker->sentence(),
             'body' => $this->faker->paragraph(),
+            'visits' => 0,
+            'slug' => Str::slug($this->faker->sentence()),
+            'locked' => false
 
         ];
     }

@@ -36,4 +36,13 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    // public function administrator()
+    // {
+    //     return $this->name(function (array $attributes) {
+    //         return [
+    //             'name' => 'JohnDoe',
+    //         ];
+    //     });
+    // }
 }

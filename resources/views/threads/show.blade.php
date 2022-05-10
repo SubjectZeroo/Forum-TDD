@@ -1,34 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <thread-view initial-replies-count="{{ $thread->replies_count }}" inline-template>
+    <thread-view :thread="{{ $thread }}" inline-template>
         <div class="container">
             <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex">
-                                <a href="{{ route('profiles', $thread->creator) }}">{{ $thread->creator->name }}</a>
-                                posted:
-                                {{ $thread->title }}
-                                @can('update', $thread)
-                                    <form method="POST" action="{{ $thread->path() }}">
-                                        @csrf
-                                        @method('DELETE')
+                <div class="col-md-8" v-cloak>
 
-                                        <button type="submit" class="btn btn-danger">Delete Thread</button>
-                                    </form>
-                                @endcan
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            {{ $thread->body }}
-                        </div>
-                    </div>
-
+                    @include('threads._question')
                     <replies @added="repliesCount++" @removed="repliesCount--"></replies>
-
-
                 </div>
                 <div class="col-md-4">
                     <div class="card">
@@ -40,7 +19,11 @@
                                 {{ Str::plural('comment', $thread->replies_count) }}.
                             </p>
                             <p>
-                                <subscribe-button :active="{{ json_encode($thread->isSubscribedTo) }}"></subscribe-button>
+                                <subscribe-button :active="{{ json_encode($thread->isSubscribedTo) }}" v-if="signedIn">
+                                </subscribe-button>
+                                <button class="btn btn-default" v-if="authorize('isAdmin')" @click="toggleLock"
+                                    v-text="locked ?  'Unlock' : 'Lock'">
+                                </button>
                             </p>
                         </div>
 

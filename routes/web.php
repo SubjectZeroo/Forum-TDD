@@ -15,28 +15,36 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('threads', [App\Http\Controllers\ThreadController::class, 'index']);
+Route::get('/home', [App\Http\Controllers\ThreadController::class, 'index'])->name('threads');
 
 Route::get('threads/create', [App\Http\Controllers\ThreadController::class, 'create']);
+Route::get('threads/search', [App\Http\Controllers\SearchController::class, 'show']);
 Route::get('threads/{channel}/{thread}', [App\Http\Controllers\ThreadController::class, 'show']);
+Route::patch('threads/{channel}/{thread}', [App\Http\Controllers\ThreadController::class, 'update'])->name('thread.update');
+
 Route::delete('threads/{channel}/{thread}', [App\Http\Controllers\ThreadController::class, 'destroy']);
-Route::post('threads', [App\Http\Controllers\ThreadController::class, 'store']);
+Route::post('threads', [App\Http\Controllers\ThreadController::class, 'store'])->middleware(['verified', 'auth']);
 Route::get('threads/{channel}', [App\Http\Controllers\ThreadController::class, 'index']);
+Route::post('locked-threads/{thread}', [App\Http\Controllers\ThreadLockedController::class, 'store'])->name('locked-threads.store')->middleware('admin');
+
+Route::delete('locked-threads/{thread}', [App\Http\Controllers\ThreadLockedController::class, 'destroy'])->name('locked-threads.destroy')->middleware('admin');
 // Route::resource('threads', ThreadController::class);
 
 Route::get('/threads/{channel}/{thread}/replies', [App\Http\Controllers\ReplyController::class, 'index']);
 Route::post('/threads/{channel}/{thread}/replies', [App\Http\Controllers\ReplyController::class, 'store']);
 Route::patch('replies/{reply}', [App\Http\Controllers\ReplyController::class, 'update']);
-Route::delete('replies/{reply}', [App\Http\Controllers\ReplyController::class, 'destroy']);
+Route::delete('replies/{reply}', [App\Http\Controllers\ReplyController::class, 'destroy'])->name('replies.destroy');
+
+Route::post('/replies/{reply}/best', [App\Http\Controllers\BestRepliesController::class, 'store'])->name('best-replies.store');
 
 Route::post('/threads/{channel}/{thread}/subscriptions', [App\Http\Controllers\ThreadSubscriptionController::class, 'store'])->middleware('auth');
 Route::delete('/threads/{channel}/{thread}/subscriptions', [App\Http\Controllers\ThreadSubscriptionController::class, 'destroy'])->middleware('auth');
@@ -49,3 +57,4 @@ Route::get('/profiles/{user}/notifications', [App\Http\Controllers\UserNotificat
 Route::delete('/profiles/{user}/notifications/{notification}', [App\Http\Controllers\UserNotificationController::class, 'destroy']);
 
 Route::get('/api/users', [App\Http\Controllers\Api\UsersControllers::class, 'index']);
+Route::post('/api/users/{user}/avatar', [App\Http\Controllers\Api\UserAvatarController::class, 'store'])->middleware('auth')->name('avatar');

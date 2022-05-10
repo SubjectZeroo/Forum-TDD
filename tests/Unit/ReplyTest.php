@@ -56,4 +56,24 @@ class ReplyTest extends TestCase
             $reply->body
         );
     }
+
+    /** @test */
+    function it_knows_if_it_is_the_best_reply()
+    {
+        $reply = Reply::factory()->create();
+
+        $this->assertFalse($reply->isBest());
+
+        $reply->thread->update(['best_reply_id' => $reply->id]);
+
+        $this->assertTrue($reply->fresh()->isBest());
+    }
+
+    /** @test */
+    function a_reply_body_is_sanitized_automatically()
+    {
+        $reply = Reply::factory()->make(['body' => '<script>alert("bad")</script><p>This is okay.</p>']);
+
+        $this->assertEquals('<p>This is okay.</p>', $reply->body);
+    }
 }

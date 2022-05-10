@@ -16,7 +16,7 @@ class Reply extends Model
 
     protected $with = ['owner', 'favorites'];
 
-    protected $appends = ['favoritesCount', 'isFavorited'];
+    protected $appends = ['favoritesCount', 'isFavorited', 'isBest'];
 
 
     protected static function boot()
@@ -29,6 +29,9 @@ class Reply extends Model
 
 
         static::deleted(function ($reply) {
+            // if ($reply->isBest()) {
+            //     $reply->thread->update(['best_reply_id' => null]);
+            // }
             $reply->thread->decrement('replies_count');
         });
     }
@@ -68,5 +71,20 @@ class Reply extends Model
             '<a href="/profiles/$1">$0</a>',
             $body
         );
+    }
+
+    public function isBest()
+    {
+        return $this->thread->best_reply_id == $this->id;
+    }
+
+    public function getIsBestAttribute()
+    {
+        return $this->isBest();
+    }
+
+    public function getBodyAttribute($body)
+    {
+        return \Purify::clean($body);
     }
 }

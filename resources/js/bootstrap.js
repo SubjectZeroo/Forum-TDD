@@ -10,15 +10,22 @@ try {
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
+let authorizations = require('./authorization');
 
-Vue.prototype.authorize = function(handler) {
+Vue.prototype.authorize = function(...params) {
     //Additional admin priviliges.
 
-    let user = window.App.user;
+    if(! window.App.signedIn) return false;
 
-    return user ? handler(user) : false;
+    if(typeof params[0] === 'string') {
+      return authorizations[params[0]](params[1]);
+    }
+
+    return params[0](window.App.user);
 
 };
+
+Vue.prototype.signedIn = window.App.signedIn;
 
 window.axios = require('axios');
 

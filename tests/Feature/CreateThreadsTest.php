@@ -9,8 +9,6 @@ use App\Models\Thread;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class CreateThreadsTest extends TestCase
@@ -31,6 +29,13 @@ class CreateThreadsTest extends TestCase
             ->assertRedirect('/login');
     }
 
+    /** @test */
+    public function authenticated_users_must_first_confirm_their_email_address_before_creating_threads()
+    {
+
+        $this->publishThread([], User::factory()->unverified()->create())
+            ->assertRedirect('email/verify');
+    }
     /** @test */
     function guest_cannot_see_the_create_page()
     {
@@ -58,7 +63,6 @@ class CreateThreadsTest extends TestCase
     }
 
     /** @test */
-
     function a_thread_requires_a_title()
     {
         $this->publishThread(['title' => null])
@@ -85,6 +89,31 @@ class CreateThreadsTest extends TestCase
     }
 
     /** @test */
+    function a_thread_requires_a_unique_slug()
+    {
+        $this->signIn();
+
+        $thread = Thread::factory()->create(['title' => 'Foo title']);
+
+        $this->assertEquals($thread->fresh()->slug, 'foo-title');
+
+        $thread = $this->postJson(route('threads'), $thread->toArray())->json();
+
+        $this->assertEquals("foo-title-{$thread['id']}", $thread['slug']);
+    }
+
+    /** @test */
+    function a_thread_with_a_title_that_ends_in_a_number_should_generate_the_proper_slug()
+    {
+        $this->signIn();
+        $thread = Thread::factory()->create(['title' => 'Some Title 24']);
+
+        $thread = $this->postJson(route('threads'), $thread->toArray())->json();
+
+        $this->assertEquals("some-title-24-{$thread['id']}", $thread['slug']);
+    }
+
+    /** @test */
     function unauthorized_users_may_not_delete_threads()
     {
         $this->expectException(AuthenticationException::class);
@@ -98,6 +127,8 @@ class CreateThreadsTest extends TestCase
         $this->signIn();
         $this->delete($thread->path())->assertStatus(403);
     }
+
+
 
     /** @test */
     function authorized_user_can_delete_threads()
@@ -135,13 +166,15 @@ class CreateThreadsTest extends TestCase
     }
 
 
-    protected function publishThread($overrides = [])
+    protected function publishThread($attributes = [], $user = null)
     {
         // $this->withoutExceptionHandling();
-        $this->signIn();
+        // $this->signIn();
 
-        $thread = Thread::factory()->make($overrides);
+        // $thread = Thread::factory()->make($overrides);
 
-        return $this->post('/threads', $thread->toArray());
+        // return $this->post('/threads', $thread->toArray());
+
+        return $this->signIn($user)->post('threads', Thread::factory()->make($attributes)->toArray());
     }
 }

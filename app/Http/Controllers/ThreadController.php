@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ThreadController extends Controller
 {
@@ -55,7 +56,7 @@ class ThreadController extends Controller
     public function store(Request $request)
     {
 
-        $this->validate($request, [
+        request()->validate([
             'title' => 'required|spamfree',
             'body' => 'required|spamfree',
             'channel_id' => 'required|exists:channels,id'
@@ -67,8 +68,12 @@ class ThreadController extends Controller
             'user_id' => Auth::id(),
             'channel_id' => request('channel_id'),
             'title' => request('title'),
-            'body' => request('body')
+            'body' => request('body'),
         ]);
+
+        if (request()->wantsJson()) {
+            return response($thread, 201);
+        }
 
 
         return redirect($thread->path())->with('flash', 'Your thread has been published');
@@ -91,6 +96,7 @@ class ThreadController extends Controller
 
         // cache()->forever($key, Carbon::now());
 
+        $thread->increment('visits');
 
 
         if (auth()->check()) {
@@ -118,9 +124,21 @@ class ThreadController extends Controller
      * @param  \App\Models\Thread  $thread
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Thread $thread)
+    public function update($channel, Thread $thread)
     {
-        //
+        $this->authorize('update', $thread);
+
+        // $data = request()->validate([
+        //     'title' => 'required|spamfree',
+        //     'body' => 'required|spamfree',
+        //     'channel_id' => 'required|exists:channels,id'
+        // ]);
+        $thread->update(request()->validate([
+            'title' => 'required|spamfree',
+            'body' => 'required|spamfree',
+        ]));
+
+        return $thread;
     }
 
     /**

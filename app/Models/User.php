@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar_path'
     ];
 
     /**
@@ -64,12 +65,27 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class);
     }
 
+    public function isAdmin()
+    {
+        return in_array($this->name, ['JohnDoe', 'JaneDoe']);
+    }
+
     public function read($thread)
     {
         cache()->forever(
             $this->visitedThreadCacheKey($thread),
             Carbon::now()
         );
+    }
+
+    public function getAvatarPathAttribute($avatar)
+    {
+        // if (!$this->avatar_path) {
+        //     return '/images/default.png';
+        // }
+        // return "/storage/" . $avatar;
+
+        return asset($avatar ?: '/images/avatars/default.png');
     }
 
     public function visitedThreadCacheKey($thread)
